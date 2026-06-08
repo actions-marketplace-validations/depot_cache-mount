@@ -4,6 +4,8 @@ Mount a durable cache directory which supports mult-write and shares content bet
 
 > The cache mount is not scoped to repository. You may share content across builds within your Depot org.
 
+> Public fork PRs skip mounting and only create the target directory.
+
 ## Usage
 
 ```yaml
