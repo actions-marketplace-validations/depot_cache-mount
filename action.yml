@@ -14,7 +14,7 @@ inputs:
       The path to the cache directory to mount.
     default: '/tmp/cache-disk'
     required: true
-  disk:
+  name:
     description: |-
       The name of the cache disk.
       Example: "cache-disk"

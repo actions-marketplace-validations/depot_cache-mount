@@ -20597,12 +20597,12 @@ async function run() {
     return;
   }
   await group("Installing archil", () => ensureArchil(debug2));
-  const { token, identifier, orgID } = await group("Acquiring disk token", () => acquireDiskToken(disk, debug2));
+  const { token, identifier, org_id } = await group("Acquiring disk token", () => acquireDiskToken(disk, debug2));
   setSecret(token);
   saveState("identifier", identifier);
   saveState("disk", disk);
   saveState("path", diskPath);
-  saveState("orgID", orgID);
+  saveState("orgID", org_id);
   await group("Mounting disk", async () => {
     if (debug2) info(`Creating directory: ${diskPath}`);
     await fs3.promises.mkdir(diskPath, { recursive: true });
@@ -20610,7 +20610,7 @@ async function run() {
       "--preserve-env=ARCHIL_MOUNT_TOKEN",
       ARCHIL_BIN,
       "mount",
-      `depot/${orgID}-${disk}`,
+      `depot/${org_id}-${disk}`,
       diskPath,
       "--region",
       "aws-us-east-1",

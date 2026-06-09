@@ -11,7 +11,7 @@ const client = new http.HttpClient('depot-cache-mount-action')
 interface DiskTokenResponse {
   token: string
   identifier: string
-  orgID: string
+  org_id: string
 }
 
 async function run() {
@@ -29,12 +29,12 @@ async function run() {
 
   await core.group('Installing archil', () => ensureArchil(debug))
 
-  const {token, identifier, orgID} = await core.group('Acquiring disk token', () => acquireDiskToken(disk, debug))
+  const {token, identifier, org_id} = await core.group('Acquiring disk token', () => acquireDiskToken(disk, debug))
   core.setSecret(token)
   core.saveState('identifier', identifier)
   core.saveState('disk', disk)
   core.saveState('path', diskPath)
-  core.saveState('orgID', orgID)
+  core.saveState('orgID', org_id)
 
   await core.group('Mounting disk', async () => {
     if (debug) core.info(`Creating directory: ${diskPath}`)
@@ -43,7 +43,7 @@ async function run() {
       '--preserve-env=ARCHIL_MOUNT_TOKEN',
       ARCHIL_BIN,
       'mount',
-      `depot/${orgID}-${disk}`,
+      `depot/${org_id}-${disk}`,
       diskPath,
       '--region',
       'aws-us-east-1',
