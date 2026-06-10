@@ -1,4 +1,4 @@
-name: Depot CI Cache disk mount
+name: Depot CI cache disk mount
 description: Mount a durable cache disk which supports mult-write and shares content between runs
 author: Depot
 branding:
