@@ -29,7 +29,9 @@ async function run() {
 
   await core.group('Installing archil', () => ensureArchil(debug))
 
-  const {token, identifier, args} = await core.group('Acquiring disk token', () => acquireDiskToken(disk, debug))
+  const {token, identifier, args} = await core.group('Acquiring disk token', () =>
+    acquireDiskToken(disk, diskPath, debug),
+  )
   core.setSecret(token)
   core.saveState('identifier', identifier)
   core.saveState('disk', disk)
@@ -38,12 +40,7 @@ async function run() {
   await core.group('Mounting disk', async () => {
     if (debug) core.info(`Creating directory: ${diskPath}`)
     await fs.promises.mkdir(diskPath, {recursive: true})
-    const cliArgs = [
-      '--preserve-env=ARCHIL_MOUNT_TOKEN',
-      ARCHIL_BIN,
-      'mount',
-      ...args,
-    ]
+    const cliArgs = ['--preserve-env=ARCHIL_MOUNT_TOKEN', ARCHIL_BIN, 'mount', ...args]
     if (debug) core.info(`Mounting disk ${disk} to ${diskPath}`)
     await exec.exec('sudo', cliArgs, {
       env: {...process.env, ARCHIL_MOUNT_TOKEN: token},
@@ -96,8 +93,8 @@ async function ensureArchil(debug: boolean) {
   await exec.exec('bash', ['-c', 'curl -fsSL https://archil.com/install | sh'])
 }
 
-async function acquireDiskToken(disk: string, debug: boolean): Promise<DiskTokenResponse> {
-  const url = `${METADATA_API}/archil/disk-token?disk=${encodeURIComponent(disk)}`
+async function acquireDiskToken(disk: string, diskPath: string, debug: boolean): Promise<DiskTokenResponse> {
+  const url = `${METADATA_API}/archil/disk-token?disk=${encodeURIComponent(disk)}&disk_path=${encodeURIComponent(diskPath)}`
   if (debug) core.info(`Requesting disk token: POST ${url}`)
   const res = await client.postJson<DiskTokenResponse>(url, {})
   if (debug) core.info(`Disk token response: status=${res.statusCode}`)
