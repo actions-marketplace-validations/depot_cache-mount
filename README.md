@@ -115,9 +115,9 @@ Disk cache mostly shines as a **shared, mostly-read artifact store** that tools 
 The recurring pattern is **one writer, many readers**: a scheduled or post-merge job populates content under a `write-lock`, then all fan-out CI jobs mount it read-only and read lock-free.
 
 Possible fits:
-- **Read-only reference data** — model weights, test fixtures, seed databases, toolchains/SDKs. Build once under a lock, read concurrently everywhere.
-- **Content-addressed tool caches** pointed at the mount via env/flag — `GOCACHE`/`GOMODCACHE`, `CARGO_HOME` registry, `~/.m2`, `~/.gradle`, `ccache`/`sccache`, Bazel/buildkit local cache.
-- **Directory-partitioned writes** — matrix or monorepo jobs that each `write-lock` only their own slice (`/tmp/cache-mount/<arch>`, `/tmp/cache-mount/<pkg>`) never contend.
+- **Read-only reference data** - model weights, test fixtures, seed databases, toolchains/SDKs. Build once under a lock, read concurrently everywhere.
+- **Content-addressed tool caches** pointed at the mount via env/flag - `GOCACHE`/`GOMODCACHE`, `CARGO_HOME` registry, `~/.m2`, `~/.gradle`, `ccache`/`sccache`, Bazel/buildkit local cache.
+- **Directory-partitioned writes** - matrix or monorepo jobs that each `write-lock` only their own slice (`/tmp/cache-mount/<arch>`, `/tmp/cache-mount/<pkg>`) never contend.
 - Something you would donwload from S3 for each jobs
 
 ## Lifecycle
