@@ -20599,8 +20599,12 @@ async function run() {
   const disk = getInput("name", { required: true });
   const writeLocks = getMultilineInput("write-lock", { required: false });
   const debug2 = getBooleanInput("debug");
-  const lockWholeDisk = writeLocks.includes(diskPath);
-  const resources = lockWholeDisk ? [diskPath] : writeLocks;
+  for (const resource of writeLocks.filter((resource2) => path4.extname(resource2))) {
+    warning(`Ignoring write-lock "${resource}": only directories can be locked, not files`);
+  }
+  const dirWriteLocks = writeLocks.filter((resource) => !path4.extname(resource));
+  const lockWholeDisk = dirWriteLocks.includes(diskPath);
+  const resources = lockWholeDisk ? [diskPath] : dirWriteLocks;
   saveState("debug", debug2 ? "true" : "");
   if (isPublicForkPR(debug2)) {
     warning("Fork PR detected \u2014 creating empty directory instead of mounting disk");
@@ -20645,15 +20649,9 @@ async function run() {
           if (debug2) info(`Setting disk permissions to runner:runner`);
           await exec("sudo", ["chown", "-R", "runner:runner", diskPath]);
           for (const resource of missing) {
-            if (path4.extname(resource)) {
-              if (debug2) info(`Creating file ${resource}`);
-              await fs3.promises.mkdir(path4.dirname(resource), { recursive: true });
-              await fs3.promises.writeFile(resource, "");
-            } else {
-              if (debug2) info(`Creating directory ${resource}`);
-              await fs3.promises.mkdir(resource, { recursive: true });
-              await exec("sudo", ["chown", "-R", "runner:runner", resource]);
-            }
+            if (debug2) info(`Creating directory ${resource}`);
+            await fs3.promises.mkdir(resource, { recursive: true });
+            await exec("sudo", ["chown", "-R", "runner:runner", resource]);
           }
         } finally {
           if (debug2) info(`Unlocking ${diskPath}`);

@@ -21,7 +21,7 @@ inputs:
     required: true
   write-lock:
     description: |-
-      Lock a directory for write operations.
+      Lock one or multiple directories for write operations.
     required: false
   debug:
     description: |-

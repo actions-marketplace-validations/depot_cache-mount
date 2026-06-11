@@ -21,9 +21,15 @@ async function run() {
   const writeLocks = core.getMultilineInput('write-lock', {required: false})
   const debug = core.getBooleanInput('debug')
 
+  // Only directories can be locked; warn about and ignore any file-like paths.
+  for (const resource of writeLocks.filter((resource) => path.extname(resource))) {
+    core.warning(`Ignoring write-lock "${resource}": only directories can be locked, not files`)
+  }
+  const dirWriteLocks = writeLocks.filter((resource) => !path.extname(resource))
+
   // Locking the disk root covers everything, so ignore any other paths in that case.
-  const lockWholeDisk = writeLocks.includes(diskPath)
-  const resources = lockWholeDisk ? [diskPath] : writeLocks
+  const lockWholeDisk = dirWriteLocks.includes(diskPath)
+  const resources = lockWholeDisk ? [diskPath] : dirWriteLocks
 
   core.saveState('debug', debug ? 'true' : '')
 
@@ -78,15 +84,9 @@ async function run() {
           await exec.exec('sudo', ['chown', '-R', 'runner:runner', diskPath])
 
           for (const resource of missing) {
-            if (path.extname(resource)) {
-              if (debug) core.info(`Creating file ${resource}`)
-              await fs.promises.mkdir(path.dirname(resource), {recursive: true})
-              await fs.promises.writeFile(resource, '')
-            } else {
-              if (debug) core.info(`Creating directory ${resource}`)
-              await fs.promises.mkdir(resource, {recursive: true})
-              await exec.exec('sudo', ['chown', '-R', 'runner:runner', resource])
-            }
+            if (debug) core.info(`Creating directory ${resource}`)
+            await fs.promises.mkdir(resource, {recursive: true})
+            await exec.exec('sudo', ['chown', '-R', 'runner:runner', resource])
           }
         } finally {
           if (debug) core.info(`Unlocking ${diskPath}`)
