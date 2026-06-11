@@ -84,6 +84,7 @@ async function run() {
           } else {
             if (debug) core.info(`Creating directory ${resource}`)
             await fs.promises.mkdir(resource, {recursive: true})
+            await exec.exec('sudo', ['chown', '-R', 'runner:runner', resource])
           }
         }
 

@@ -20661,6 +20661,7 @@ async function run() {
       for (const resource of resources) {
         if (debug2) info(`Locking ${resource} for write`);
         await exec(ARCHIL_BIN, ["checkout", resource, "-y"]);
+        await exec("sudo", ["chown", "-R", "runner:runner", resource]);
       }
     });
   }
