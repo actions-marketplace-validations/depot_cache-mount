@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as http from '@actions/http-client'
 import * as fs from 'node:fs'
+import * as path from 'node:path'
 
 const METADATA_API = 'http://169.254.169.253:80'
 const ARCHIL_BIN = '/usr/bin/archil'
@@ -49,16 +50,25 @@ async function run() {
     })
   })
 
-  await core.group('Checking out disk', async () => {
+  await core.group('Fixing permissions', async () => {
+    if (debug) core.info(`Setting disk permissions to runner:runner`)
+    await exec.exec('sudo', ['chown', '-R', 'runner:runner', diskPath])
+  })
+
+  await core.group('Preparing resources', async () => {
+    for (const resource of writeLocks) {
+      if (fs.existsSync(resource)) continue
+      if (path.extname(resource)) continue
+      if (debug) core.info(`Creating directory ${resource}`)
+      await fs.promises.mkdir(resource, {recursive: true})
+    }
+  })
+
+  await core.group('Locking resources', async () => {
     for (const writeLock of writeLocks) {
       if (debug) core.info(`Locking ${writeLock} for write`)
       await exec.exec(ARCHIL_BIN, ['checkout', writeLock, '-y'])
     }
-  })
-
-  await core.group('Fixing permissions', async () => {
-    if (debug) core.info(`Setting disk permissions to runner:runner`)
-    await exec.exec('sudo', ['chown', '-R', 'runner:runner', diskPath])
   })
 }
 

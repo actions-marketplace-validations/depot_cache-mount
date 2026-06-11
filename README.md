@@ -25,6 +25,7 @@ jobs:
 | ---------- | -------- | ----------------------- | --------------------------------------------------------------- |
 | `path`     | **Yes**  | -       | OS location to mount the cache disk.                            |
 | `name`     | **Yes**  | -                       | Name of the disk. Reuse the same name across runs to reference it. Created automatically on first use. |
+| `write-lock` | No     | -                       | Lock a directory for writes. If the directory doesn't exist, it will be pre-created.                                                |  
 | `debug`    | No       | `false`                 | Enable verbose logging                                          |
 
 ## License
