@@ -20654,7 +20654,7 @@ async function run() {
           }
         }
         if (debug2) info(`Unlocking ${diskPath}`);
-        await exec(ARCHIL_BIN, ["checkin", diskPath]);
+        await exec(ARCHIL_BIN, ["checkin", diskPath, "-y"]);
       });
     }
     await group("Locking resources", async () => {

@@ -88,7 +88,7 @@ async function run() {
         }
 
         if (debug) core.info(`Unlocking ${diskPath}`)
-        await exec.exec(ARCHIL_BIN, ['checkin', diskPath])
+        await exec.exec(ARCHIL_BIN, ['checkin', diskPath, '-y'])
       })
     }
 
