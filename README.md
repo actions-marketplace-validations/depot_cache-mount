@@ -34,7 +34,7 @@ jobs:
 
 ## File operations
 
-### Read-only
+### Read-only
 By default (when `write-lock` isn't used), the disks are in read-only mode. Technically a single client might perform certain write operations within already existing directories, but the write performance is lacking and we generally advise against it. As a rule of thumb, when `write-lock` isn't used, only use the disk for read operations.
 
 ### Exclusive disk locking
